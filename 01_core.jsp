@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8" import="java.util.ArrayList, com.kh.model.vo.Person"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>    
 <!DOCTYPE html>
 <html>
@@ -47,7 +47,7 @@
     <c:set var="result" value="${num1 + num2 }" scope="session" />
     <!-- 
         sessionScope 에 result 라는 키값으로 num1값과 num2값을 합친 결과물이 담긴 상태
-        session.setAttribute("result",(int)pageContext.getAttribute("num1")+(int)request.getAttribute("num2"));
+        session.setAttribute("result",(int)pageContext.getAttribute("num1")+(int)request.getAttribute("num2")); 구문과 동일한 역할
      -->
      
      result 변수값 : ${ result } <br><br>
@@ -111,14 +111,261 @@
 
    <!-- escapeXml 테스트 -->
    <c:set var="outTest" value="<b>출력테스트</b>" />
+   
    <c:out value="${outTest}" /><br>
    <!-- escapeXml 생략시 기본값이 true=태그 해석 안됨 (문자열로 취급) -->
+   
    <c:out value="${outTest}" escapeXml="false"/>
    
    <hr>
    
-   <h3>2. 조건문 </h3>
+   <h3>2. 조건문 -if( &lt; c:if test="조건식" &gt; ) </h3>
    
+   <pre>
+    -JAVA 의 단일 if 문과 비슷한 역할을 하는 태그
+    -단, 조건식은 test 속성에 적되, EL구문으로 작성해야 함!! 
+   </pre>
+   
+   <!-- 기존 방식 -->
+   <% if(true) { %>
+   
+      <!-- 조건식이 true 일 경우 보여질 html 태그들 -->
+   
+   <% } %>
+   
+   <c:if test="${num1 gt num2}"> <!-- 조건식이 false이므로 해당 내용물이 안보임 -->
+     <b>num1이 num2 보다 큽니다.</b>
+   </c:if>
+   
+   <c:if test="${num1 le num2 }"> <!-- 조건식이 true 이므로 해당 내용물이 보임 -->
+    <b>num1이 num2 보다 작거나 같습니다.</b>
+   </c:if>
+   
+   <br>
+  
+   <c:set var="str" value="안녕하세요" />
+   
+   <!-- 기존 방식 -->
+       
+   <% if(( (String)pageContext.getAttribute("str") ).equals("안녕하세요 ")) {%>
+        <!-- str 키값에 담긴 내용물과 "안녕하세요"기 일치할 경우 보여질 내용물 -->
+   <% } %>
+   
+   <c:if test="${str eq '안녕하세요'}">
+   
+     <mark>Hello World!</mark>
+   </c:if>
+   
+   <c:if test="${str ne '안녕하세요'}">
+   
+     <mark>Goodbye World!</mark>
+   </c:if>
+  
+   
+   <h3>3. 조건문- choose, when, otherwise(&lt;c:choose&gt;, &lt;c:when test="조건식"&gt;, &lt;c:otherwise&gt;)</h3>
+   <pre>
+   - JAVA의 if-else문, if-else if문, switch 문과 비슷한 역할을 하는 태그들
+   - 각 조건들을 c: choose의 하위 요소로 묶어서 c:when 으로 조건을 작성 
+   
+   </pre>
+   
+   <!-- 기존 방법 -->
+   <%-- 
+   <% if(num1 ==20 ) { %>
+   
+   <% else if(num1 == 10) %>
+   
+   <% } else { %>
+   
+   <% } %>
+   --%>
+   
+   <c:choose>
+     <c:when test="${num1 eq 20 }"> <!-- if -->
+        <b>처음 뵙겠습니다.</b>
+     </c:when>
+     <c:when test="${ num1 eq 10 }"> <!-- else if -->
+       <b>다시 봐서 반갑습니다.</b>
+     </c:when>
+     <c:otherwise> <!-- else -->
+      <b>안녕하세요</b>
+     </c:otherwise>
+   </c:choose>
+   
+   <hr>
+   <h3>4.반복문 - forEach</h3>
+   <pre>
+   - 속성을 어떻게 쓰느냐에 따라 두가지 용법으로 나뉨
+   [표현법]
+   for loop문 (초기식, 조건식,증감식)
+   &lt; c:forEach var="변수명" begin="초기값" end="끝값" step="증가시킬값(생략가능)" &gt;
+        반복적으로 찍어내고자 하는 내용물
+  &lt;/c:forEach &gt;
+  
+  => var, begin: 기존의 일반 for문의 초기식에 해당되는 속성들
+  => end : 기존의 일반 for문의 조건식에 해당되는 속성
+  => step : 기존의 일반 for문의 증감식에 해당되는 속성 (생략가능, 생략시 1이 기본값)
+  
+     향상된 for문(변수선언부, 배열명 또는 컬렉션명)
+     &lt;c:forEach var = "변수명" items="순차적으로접근할배열명또는컬렉션명" varStatus="현재접근된요소의상태값을보관할변수명(생략가능)"&gt;
+              반복적으로 찍어내고자 하는 내용물
+     &lt;/c:forEach&gt;
+   </pre>
+   
+   <!-- 기존 방법 -->
+   <!-- for loop문 -->
+   <%-- 
+   <% for(int i=1; i<=10; i++) {%>
+   
+   <% } %>
+   --%>
+   <c:forEach var= "i" begin="1" end="10" > <!-- step속성 생략시 기본값 1 -->
+        반복 확인 : ${ i } <br>
+    </c:forEach>
+    
+    <br>
+    <!-- 2씩 증가할 경우 -->
+    <% for(int i=1; i<=10; i+=2) { %>
+    
+    <% } %>
+   
+   <c:forEach var="i" begin="1" end="10" step="2">
+        반복 확인 : ${ i } <br>
+   </c:forEach>
+   
+   <br>
+   
+   <!-- var 속성에 작성한 변수는 태그 내에서도 사용 가능  -->
+   <c:forEach var="i" begin="1" end="6" step="1">
+      <h${ i }>태그안에서도 적용 가능함<h${ i }>
+   </c:forEach>
+   
+   <br>
+   <!-- 향상된 for문 -->
+   <%-- 
+   <% for(Board b : list) {%>
+      <!-- b.getter메소드 이용해서 매번 테이블을 만들거나 했었음 -->
+   <% } %>
+   --%>
+   
+   <!-- 테스트를 위한 변수 셋팅 -->
+   <c:set var="colors">
+         red, yellow, green, pink
+   </c:set> <!-- 배열과 같은 역할 -->
+   
+   colors 값 : ${ colors } <br>
+   
+   <ul>
+        <c:forEach var="c" items="${ colors }">
+          <li style="color:${ c }">${ c }</li>
+        </c:forEach>
+   </ul>
+   
+   <br>
+   
+   <%
+     // 서블릿에서 넘겨받았다는 가정하에 작성 
+     ArrayList<Person> list = new ArrayList<>(); 
+     list.add(new Person("홍길동",20,"남자"));
+     list.add(new Person("김말순",30,"여자"));
+     list.add(new Person("박말똥",40,"남자"));
+     
+     request.setAttribute("pList",list);
+   %>
+   
+   <!-- 응용 : DB로 부터 위의 내용들을 조회했다라는 가정하에 table로 구성하기 -->
+   <table border="1">
+       <thead>
+          <tr>
+            <th>순번</th>
+            <th>이름</th>
+            <th>나이</th>
+            <th>성별</th>
+          </tr> 
+       </thead>
+       <tbody>
+           <!-- 기존방법: if문으로 비어있나 안비어있나 검사 후 안비어있다면 그때 반복  -->
+           <%-- 
+	           <% if(pList.isEmpty()) {%>
+	           
+	           <% } else { %>
+	             <%for(Person p : pList) { %>
+	             
+	           <% } %>
+	          <% } %>
+          --%>
+          
+          <!-- core library를 이용한 방법 -->
+          <c:choose>
+            <c:when test="${ empty pList }">
+              <tr align="center">
+                 <td colspan="4">조회결과가 없습니다.</td>
+              </tr>
+            </c:when>
+            <c:otherwise>            
+              <c:forEach var="p" items="${ pList }" varStatus="status">
+                <tr align="center"> 
+                  <td>${ status.count }</td> <!--index: 0부터/ count: 1부터 시작 -->
+                  <td>${ p.name }</td>
+                  <td>${ p.age }</td>
+                  <td>${ p.gender }</td>
+                </tr>
+              </c:forEach>
+            </c:otherwise>
+          </c:choose>
+          
+       </tbody>
+   </table>
+   
+   <hr>
+   
+   <h3> 5. 반복문 - forTokens</h3>
+   
+   <pre>
+    - JAVA 의 StringTokenizer 클래스, split("구분자"); 와 유사한 역할
+    - 구분자를 통해서 분리된 각각의 문자열에 순차적으로 접근하면서 반복을 수행
+    
+    [표현법]
+    &lt;c:forTokens var="각값을보관할변수" items="분리시키고자하는원본문자열" delims="구분자"&gt;
+          반복적으로 수행할 내용물들 
+     &lt;/c:forTokens&gt;
+   </pre>
+   
+   <!-- 테스트용 데이터 -->
+   <c:set var="device" value="컴퓨터,휴대폰,TV,에어컨/냉장고.세탁기" />
+   
+   <ul>
+      <c:forTokens var="d" items="${device}" delims=",/.">
+         <li>${ d }</li>
+      </c:forTokens>
+   </ul>
+   
+   <hr>
+   
+   <h3>6.쿼리스트링 관련 태그 - url, param</h3>
+   
+   <pre>
+   - url 경로를 생성하고, 쿼리스트링을 정의할 수 있는 태그
+   - 넘겨야할 쿼리스트링이 길 경우 사용하면 편하다.
+   
+   [ 표현법 ]
+   &lt;c:url var="만들어진url을담을변수명" value="요청할 url"&gt;
+     &lt;c:param name="키값" value="밸류값" /&gt;
+     &lt;c:param name="키값" value="밸류값" /&gt;
+     .. 
+   &lt;/c:url&gt;
+  </pre>
+   
+   <!-- 기존 방식 -->
+   <a href="list.do?currentPage=1&num2">기존방식</a>
+   
+   <!--core library를 이용한 방식 -->
+   <c:url var="query" value="list.do">
+     <c:param name="currentPage" value="1" />
+     <c:param name="num" value="2" />
+   </c:url> <!-- 내부적으로 list.do?currentPage=1&num2가 만들어져서 query라는 변수에 담겨있음 -->
+   
+   <a href="${ query }"> c:url을 이용한 방식</a>
    
    
 </body>

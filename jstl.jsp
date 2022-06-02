@@ -27,7 +27,7 @@
     taglib 지시어를 사용해서 선언함 <br><br>
     
     [표현법] <br>
-    &lt;%@ taglib prefix="접두어" uri="라이브러리 파일상의 주소" %>&gt;
+    &lt; %@ taglib prefix="접두어" uri="라이브러리 파일상의 주소" % &gt;
   </p>
    <hr>
    
@@ -43,11 +43,13 @@
     <p>
         숫자, 날짜 및 시간 데이터의 출력 형식을 지정할 때 사용하는 문법을 제공
     </p>
+    <a href="02_formatting.jsp">formatting library</a>
  
    <h4>3.JSTL Functions Library</h4>
      <p>
      EL 구문 안에서 사용할 수 있는 메소드를 제공
      </p>
+     <a href="03_functions.jsp">functions library</a>
 
 </body>
 </html>
